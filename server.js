@@ -16,7 +16,10 @@ mongoose
     useCreateIndex: true,
     useFindAndModify: false
   })
-  .then(() => console.log('MongoDB success!'));
+  .then(() => console.log('MongoDB success!'))
+  .catch(error => {
+    console.log(error);
+  });
 
 const server = app.listen(3000, () => {
   console.log('Listening on port 3000...');

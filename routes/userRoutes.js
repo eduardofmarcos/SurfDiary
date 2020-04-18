@@ -4,11 +4,16 @@ const authController = require('../controllers/authController');
 
 const router = express.Router();
 
-// User verbs
-router.get('/myfeed', authController.protect, userController.showMyFeed);
+//********************** Users routes - Start **********************/
 router.get('/me', authController.protect, userController.getMe);
-router.post('/postmypic', authController.protect, userController.postMyPic);
 router.patch('/updateme', authController.protect, userController.updateMe);
-router.delete('/deleteme', authController.protect, userController.deleteMe);
+router.patch('/deleteme', authController.protect, userController.deleteMe);
+
+//********************** Admin - Users routes - Start **********************/
+
+router.get('/getuser/:id', userController.getUser);
+router.get('/getallusers', userController.getAllUsers);
+router.patch('/updateuser/:id', userController.updateUser);
+router.delete('/deleteuser/:id', userController.deleteUser);
 
 module.exports = router;
