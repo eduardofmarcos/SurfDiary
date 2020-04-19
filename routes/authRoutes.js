@@ -9,6 +9,7 @@ router.post('/login', authController.login);
 router.get('/logout', authController.protect, authController.logout);
 router.post('/forgotpassword', authController.forgotPassword);
 router.patch('/resetpassword/:token', authController.resetPassword);
+router.get('/verifyaccount/:token', authController.verifyAccount);
 //********************** Auth Routes - End **********************/
 
 module.exports = router;

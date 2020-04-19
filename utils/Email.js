@@ -21,10 +21,42 @@ module.exports = class Email {
     });
   }
 
-  async sendTheEmail() {
-    await this.newTransport().sendMail({
+  async send(template, subject) {
+    // sending the acctual email
+    const html = pug.renderFile(
+      `${__dirname}/../views/emails/${template}.pug`,
+      {
+        firstName: this.firstName,
+        url: this.url,
+        subject
+      }
+    );
+
+    // define the email options
+    const mailOptions = {
       from: this.from,
-      to: this.to
-    });
+      to: this.to,
+      subject,
+      html,
+      text: htmlToText.fromString(html)
+    };
+
+    // create a transport and send the email
+
+    await this.newTransport().sendMail(mailOptions);
+  }
+
+  async sendResetPassword() {
+    await this.send(
+      'passwordReset',
+      'Reset your password! (the token is valid for 10 minutes)'
+    );
+  }
+
+  async sendVerify() {
+    await this.send(
+      'AccountVerification',
+      'Please verify your account before have fun with us :)!'
+    );
   }
 };

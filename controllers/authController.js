@@ -1,7 +1,9 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
+const Token = require('./../models/Token');
 const { promisify } = require('util');
 const Email = require('./../utils/Email');
+const crypto = require('crypto');
 
 //********************** JWT - Token Handlers - Start **********************/
 const signToken = id => {
@@ -40,6 +42,24 @@ const sendTokens = (user, statusCode, req, res) => {
 
 //********************** JWT - Token Handlers - End **********************/
 
+//********************** Email verification - Token Handlers - Start **********************/
+
+exports.verifyAccount = async (req, res, next) => {
+  const verificationToken = req.params.token;
+
+  const getUserByToken = await Token.findOne({ token: verificationToken });
+
+  await User.findByIdAndUpdate(getUserByToken._userId, {
+    active: true
+  });
+
+  return res.status(200).json({
+    status: 'success',
+    message: 'Thank you! You successfully verified your account :)'
+  });
+};
+
+//********************** Email verification - Token Handlers - End **********************/
 //********************** Auth Handlers - Start **********************/
 
 exports.signup = async (req, res, next) => {
@@ -56,6 +76,18 @@ exports.signup = async (req, res, next) => {
     status: 'success',
     data: newUser
   });
+
+  // creating the verification Token to send via email
+  const token = await Token.create({
+    _userId: newUser._id,
+    token: crypto.randomBytes(16).toString('hex')
+  });
+  // getting the route for user verify the account
+  const urlTo = 'http://localhost:4000/auth/verifyaccount/';
+  const urlToVerify = urlTo + token.token;
+  console.log(urlToVerify);
+  // sendind the verification token email
+  await new Email(newUser, urlToVerify).sendVerify();
 };
 
 exports.login = async (req, res, next) => {
@@ -79,6 +111,14 @@ exports.login = async (req, res, next) => {
   );
   if (!checkedPass)
     return res.status(401).json({ status: 'Email or Password incorrect!' });
+
+  //verify if the user is active:
+  if (!userToLogin.active)
+    return res.status(401).json({
+      status: 'Fail',
+      message: 'Please you need to verify your account!'
+    });
+
   //send authentication token
   sendTokens(userToLogin, 200, req, res);
 };
@@ -114,7 +154,7 @@ exports.forgotPassword = async (req, res, next) => {
       'host'
     )}/auth/resetpassword/${tokenToSendToUrl}`;
     console.log(resetUrl);
-    await new Email(userToResetPassword, resetUrl).sendTheEmail();
+    await new Email(userToResetPassword, resetUrl).sendResetPassword();
 
     return res.status(200).json({
       status: 'success',
@@ -123,15 +163,49 @@ exports.forgotPassword = async (req, res, next) => {
   } catch (error) {
     userToResetPassword.passwordResetToken = undefined;
     userToResetPassword.passwordResetExpires = undefined;
-    userToResetPassword.save({ validateBeforeSave: false });
+    //userToResetPassword.save({ validateBeforeSave: false });
 
     console.log(error);
     res.status(400).json({ error: error });
   }
 };
 
-exports.resetPassword = (req, res, next) => {
-  res.send('Post your new password');
+exports.resetPassword = async (req, res, next) => {
+  // get user based on token
+  const tokenToReset = req.params.token;
+
+  const hashToken = crypto
+    .createHash('sha256')
+    .update(tokenToReset)
+    .digest('hex');
+
+  const userToResetPassword = await User.findOne({
+    passwordResetToken: hashToken,
+    passwordResetExpires: {
+      $gt: Date.now()
+    }
+  });
+
+  // if token has not been expired and there is a user to reset
+
+  if (!userToResetPassword)
+    return res.status(401).json({
+      status: 'Fail',
+      message: 'There is no user or the token has been expired! :('
+    });
+
+  // if there is a user based on token and the token itself has not been expired, grant the patch
+  userToResetPassword.password = req.body.password;
+  userToResetPassword.confirmPassword = req.body.confirmPassword;
+  userToResetPassword.passwordResetToken = undefined;
+  userToResetPassword.passwordResetExpires = undefined;
+
+  // saving the new password
+  await userToResetPassword.save();
+
+  // creating new tokens and loggin the user on app
+
+  sendTokens(userToResetPassword, 200, req, res);
 };
 
 // Protect Middleware
