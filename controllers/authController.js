@@ -1,9 +1,9 @@
-const jwt = require('jsonwebtoken');
-const User = require('../models/User');
-const Token = require('./../models/Token');
 const { promisify } = require('util');
-const Email = require('./../utils/Email');
+const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
+const Email = require('../utils/Email');
+const User = require('../models/User');
+const Token = require('../models/Token');
 
 //********************** JWT - Token Handlers - Start **********************/
 const signToken = id => {
