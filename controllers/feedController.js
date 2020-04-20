@@ -1,7 +1,7 @@
+const sharp = require('sharp');
+const multer = require('multer');
 const User = require('../models/User');
 const Feed = require('../models/Feed');
-const multer = require('multer');
-const sharp = require('sharp');
 
 //********************** Multer - Start **********************/
 
