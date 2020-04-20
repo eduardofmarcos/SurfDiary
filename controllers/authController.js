@@ -40,6 +40,31 @@ const sendTokens = (user, statusCode, req, res) => {
   });
 };
 
+//RefreshToken Handler
+const blackList = []; //it will be replaced by redis
+exports.refreshToken = async (req, res, next) => {
+  const tokenToVerify = req.params.token;
+  if (blackList.includes(tokenToVerify))
+    return res.status(400).json({ status: 'Fail', message: '' });
+  blackList.push(tokenToVerify);
+
+  // verify the token
+  const decoded = await promisify(jwt.verify)(
+    tokenToVerify,
+    process.env.JWT_REFRESH_SECRET
+  );
+
+  const { id } = decoded;
+
+  const accessToken = jwt.sign({ id }, process.env.JWT_SECRET, {
+    expiresIn: '7d'
+  });
+
+  res.cookie('accessToken', accessToken);
+
+  res.status(200).json({ status: 'success', message: 'refreshed' });
+};
+
 //********************** JWT - Token Handlers - End **********************/
 
 //********************** Email verification - Token Handlers - Start **********************/
@@ -230,6 +255,13 @@ exports.protect = async (req, res, next) => {
     return res
       .status(401)
       .json({ status: 'You do not have access to this route:)' });
+
+  // checking if is a active user
+  if (!currentUser.active)
+    return res.status(200).json({
+      status: 'fail',
+      message: 'You do not have access to this route :('
+    });
 
   // give protected access to follow user
   req.user = currentUser;

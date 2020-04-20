@@ -29,7 +29,6 @@ const upload = multer({ storage: multerStorage, filter: multerFilter });
 //resizing photos
 exports.resizeUserPhoto = async (req, res, next) => {
   if (!req.file) return next();
-  console.log('passou aqui');
 
   req.file.filename = `user-${req.user._id}-${Date.now()}.jpeg`;
 
@@ -47,7 +46,9 @@ exports.uploadFeed = upload.single('photo');
 exports.myFeed = async (req, res, next) => {
   const { _id } = await User.findById(req.user._id);
 
-  const allOPhotos = await Feed.find({ _userId: _id });
+  const allOPhotos = await Feed.find({ _userId: _id }).sort({
+    createdAt: '-1'
+  });
 
   res.status(200).json({ status: 'success', data: allOPhotos });
 };
@@ -59,7 +60,8 @@ exports.postPic = async (req, res, next) => {
     _userId: _id,
     comment: req.body.comment,
     ratingOfDay: req.body.ratingOfDay,
-    photo: req.file.filename
+    photo: req.file.filename,
+    location: req.body.location
   });
 
   res.status(200).json({ data: newPic });

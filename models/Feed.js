@@ -23,6 +23,15 @@ const feedSchema = new mongoose.Schema({
     type: Date,
     default: Date.now()
   },
+  location: {
+    // GeoJSON
+    type: {
+      type: String,
+      default: 'Point',
+      enum: ['Point']
+    },
+    coordinates: [Number]
+  },
   createdAt: {
     type: Date,
     default: Date.now(),
