@@ -13,7 +13,8 @@ const feedSchema = new mongoose.Schema({
   ratingOfDay: {
     type: Number,
     min: [1, 'A day must have a minimum rating of 1'],
-    max: [5, 'A day must have a maximum rating of 5']
+    max: [5, 'A day must have a maximum rating of 5'],
+    required: true
   },
   photo: {
     type: String,
