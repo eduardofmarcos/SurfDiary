@@ -11,9 +11,29 @@ router.patch('/deleteme', authController.protect, userController.deleteMe);
 
 //********************** Admin - Users routes - Start **********************/
 
-router.get('/getuser/:id', userController.getUser);
-router.get('/getallusers', userController.getAllUsers);
-router.patch('/updateuser/:id', userController.updateUser);
-router.delete('/deleteuser/:id', userController.deleteUser);
+router.get(
+  '/getuser/:id',
+  authController.protect,
+  authController.restrictTo,
+  userController.getUser
+);
+router.get(
+  '/getallusers',
+  authController.protect,
+  authController.restrictTo,
+  userController.getAllUsers
+);
+router.patch(
+  '/updateuser/:id',
+  authController.protect,
+  authController.restrictTo,
+  userController.updateUser
+);
+router.delete(
+  '/deleteuser/:id',
+  authController.protect,
+  authController.restrictTo,
+  userController.deleteUser
+);
 
 module.exports = router;

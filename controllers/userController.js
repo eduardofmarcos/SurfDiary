@@ -37,7 +37,7 @@ exports.getUser = catchAsync(async (req, res, next) => {
   const userToGet = await User.findById(idUserToGet);
 
   if (!userToGet)
-    return next(new AppError('There is no user with this Id :(', 400));
+    return next(new AppError('There is no user with this Id :(', 404));
 
   res.status(200).json({ status: 'success', data: userToGet });
 });
@@ -55,7 +55,7 @@ exports.updateUser = catchAsync(async (req, res, next) => {
   const userUpdated = await User.findByIdAndUpdate(idUserToGet, dataToUpdate);
 
   if (!userUpdated)
-    return next(new AppError('There is no user with this Id :(', 400));
+    return next(new AppError('There is no user with this Id :(', 404));
 
   res.status(200).json({ status: 'success', data: userUpdated });
 });
@@ -66,7 +66,7 @@ exports.deleteUser = catchAsync(async (req, res, next) => {
   const userToDelete = await User.findByIdAndDelete(idUserToGet);
 
   if (!userToDelete)
-    return next(new AppError('There is no user with this Id :(', 400));
+    return next(new AppError('There is no user with this Id :(', 404));
   res.status(204).json({});
 });
 

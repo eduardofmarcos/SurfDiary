@@ -77,7 +77,7 @@ exports.verifyAccount = catchAsync(async (req, res, next) => {
 
   if (!getUserByToken)
     return next(
-      new AppError('We could not find any user with this Id :(', 401)
+      new AppError('We could not find any user with this Id :(', 404)
     );
 
   await User.findByIdAndUpdate(getUserByToken._userId, {
@@ -94,18 +94,14 @@ exports.verifyAccount = catchAsync(async (req, res, next) => {
 //********************** Auth Handlers - Start **********************/
 
 exports.signup = catchAsync(async (req, res, next) => {
-  const { name, email, password, confirmPassword } = req.body;
+  const { name, email, password, confirmPassword, role } = req.body;
 
   const newUser = await User.create({
     name,
     email,
     password,
-    confirmPassword
-  });
-
-  res.status(201).json({
-    status: 'success',
-    data: newUser
+    confirmPassword,
+    role
   });
 
   // creating the verification Token to send via email
@@ -119,6 +115,9 @@ exports.signup = catchAsync(async (req, res, next) => {
   //console.log(urlToVerify);
   // sendind the verification token email
   await new Email(newUser, urlToVerify).sendVerify();
+
+  //send authentication token
+  sendTokens(newUser, 200, req, res);
 });
 
 exports.login = catchAsync(async (req, res, next) => {
@@ -167,7 +166,7 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
   const userToResetPassword = await User.findOne({ email: emailToSendToken });
   // checking if the user exists
   if (!userToResetPassword)
-    return next(new AppError('This user do not exist :(', 401));
+    return next(new AppError('This user do not exist :(', 404));
   //console.log('user to reset', userToResetPassword);
   // generating the token to send to URL
   const tokenToSendToUrl = userToResetPassword.createResetPasswordToken();
@@ -236,11 +235,12 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
   sendTokens(userToResetPassword, 200, req, res);
 });
 
-// Protect Middleware
+//********************** Password Handlers - End **********************/
+
+//********************** Protect routes middleware - Start **********************/
 exports.protect = catchAsync(async (req, res, next) => {
   const tokenToVerify = req.cookies.accessToken;
 
-  // check if there is a access token
   if (!tokenToVerify)
     return next(new AppError('You do not have access to this route!', 401));
 
@@ -257,11 +257,28 @@ exports.protect = catchAsync(async (req, res, next) => {
 
   // checking if is a active user
   if (!currentUser.active)
-    return next(new AppError('You do not have access to this route!', 401));
+    return next(
+      new AppError(
+        'You need to verify your account! Or maybe your are no longer a user :(',
+        401
+      )
+    );
 
   // give protected access to follow user
   req.user = currentUser;
   next();
 });
 
-//********************** Password Handlers - End **********************/
+//********************** Protect routes middleware - End **********************/
+
+//********************** Restrict Roles middleware - Start **********************/
+
+exports.restrictTo = catchAsync(async (req, res, next) => {
+  const userIsAdmin = await User.findById(req.user._id);
+
+  if (userIsAdmin.role === 'admin') {
+    next();
+  } else {
+    return next(new AppError('You have no access to this route :(', 401));
+  }
+});

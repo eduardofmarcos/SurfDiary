@@ -18,15 +18,15 @@ const AppError = require('../utils/AppError');
 // });
 
 const multerFilter = (req, file, cb) => {
-  if (req.file.mimetype.startsWith('image')) {
+  if (file.mimetype.startsWith('image')) {
     cb(null, true);
   } else {
-    cb(new Error('denied'), false);
+    cb(new AppError('Only pictures are allowed :)', 401), false);
   }
 };
 const multerStorage = multer.memoryStorage();
 
-const upload = multer({ storage: multerStorage, filter: multerFilter });
+const upload = multer({ storage: multerStorage, fileFilter: multerFilter });
 
 //resizing photos
 exports.resizeUserPhoto = async (req, res, next) => {
@@ -82,7 +82,7 @@ exports.deletePic = catchAsync(async (req, res, next) => {
   const picToDelete = await Feed.findByIdAndDelete(PicIdToDelete);
 
   if (!picToDelete)
-    return next(new AppError('There is no picture with this Id :('), 400);
+    return next(new AppError('There is no picture with this Id :(', 404));
 
   res.status(204).json({});
 });

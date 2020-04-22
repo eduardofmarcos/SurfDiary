@@ -5,7 +5,9 @@
   "main": "index.js",
   "scripts": {
     "dev": "nodemon server.js",
+    "build": "NODE_ENV=production nodemon server.js",
     "authServer": "nodemon authServer.js",
+    "buildauthServer": "NODE_ENV=production nodemon authServer.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
