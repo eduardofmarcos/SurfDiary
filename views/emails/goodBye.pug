@@ -2,7 +2,8 @@ extends baseEmail
 
 block content
     p Hi #{firstName},
-    p Forgot your password? Please submit a patch request with your new password and new password confirm to: #{url}.
+    p We are sorry you are leaving :(
+    p But with a simple login you can get back! :)
     table.btn.btn-primary(role='presentation', border='0', cellpadding='0', cellspacing='0')
         tbody
             tr
@@ -11,5 +12,6 @@ block content
                         tbody
                             tr
                                 td
-                                    a(href=`${url}`, target='_blank') Reset your password
-    
+                                    a(href=`${url}`, target="#") Give a Cut Back!
+    p If you need any help with booking your next tour, please don't hesitate to contact me!
+    p - Eduardo Marcos, CEO

@@ -1,6 +1,7 @@
 const User = require('../models/User');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/AppError');
+const Email = require('../utils/Email');
 
 //********************** Users Handlers - Start **********************/
 
@@ -18,9 +19,20 @@ exports.updateMe = catchAsync(async (req, res, next) => {
 });
 
 exports.deleteMe = catchAsync(async (req, res, next) => {
-  await User.findByIdAndUpdate(req.user._id, {
+  const userToDesativate = await User.findByIdAndUpdate(req.user._id, {
     active: false
   });
+
+  const url = 'http://localhost:4000/auth/login';
+  try {
+    await new Email(userToDesativate, url).sendGoodbye();
+  } catch (error) {
+    res.status(400).json({
+      status: 'fail',
+      message:
+        'It was not possible to send the desactivate email at the moment :('
+    });
+  }
 
   res
     .status(200)

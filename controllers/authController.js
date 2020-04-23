@@ -80,14 +80,25 @@ exports.verifyAccount = catchAsync(async (req, res, next) => {
       new AppError('We could not find any user with this Id :(', 404)
     );
 
-  await User.findByIdAndUpdate(getUserByToken._userId, {
-    active: true
-  });
+  const userToUpdateAndSendWelcome = await User.findByIdAndUpdate(
+    getUserByToken._userId,
+    {
+      active: true
+    }
+  );
 
-  return res.status(200).json({
-    status: 'success',
-    message: 'Thank you! You successfully verified your account :)'
-  });
+  try {
+    await new Email(userToUpdateAndSendWelcome).sendWelcome();
+    return res.status(200).json({
+      status: 'success',
+      message: 'Thank you! You successfully verified your account :)'
+    });
+  } catch (error) {
+    return res.status(400).json({
+      status: 'fail',
+      message: 'It was not possible to send the welcome email at the moment :('
+    });
+  }
 });
 
 //********************** Email verification - Token Handlers - End **********************/
@@ -114,7 +125,15 @@ exports.signup = catchAsync(async (req, res, next) => {
   const urlToVerify = urlTo + token.token;
   //console.log(urlToVerify);
   // sendind the verification token email
-  await new Email(newUser, urlToVerify).sendVerify();
+  try {
+    await new Email(newUser, urlToVerify).sendVerify();
+  } catch (error) {
+    return res.status(400).json({
+      status: 'fail',
+      message:
+        'It was not possible to send the verification email at the moment :('
+    });
+  }
 
   //send authentication token
   sendTokens(newUser, 200, req, res);

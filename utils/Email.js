@@ -59,4 +59,18 @@ module.exports = class Email {
       'Please verify your account before have fun with us :)!'
     );
   }
+
+  async sendWelcome() {
+    await this.send(
+      'welcome',
+      'Welcome to surfDiary. Made from surfers to surfers :)'
+    );
+  }
+
+  async sendGoodbye() {
+    await this.send(
+      'goodBye',
+      'Thank you for has joined us :). If you miss us, login again :)'
+    );
+  }
 };
