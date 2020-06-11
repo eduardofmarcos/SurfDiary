@@ -1,4 +1,4 @@
-###### SurfDiary
+###### SurfDiary (in development)
 
 # SurfDiary app
 
