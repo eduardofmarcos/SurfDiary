@@ -17,7 +17,7 @@ The app itself is built with node.js, React (in development) and React Native (i
 
 ##### Dependecies:
 
-      backend:
+      //backend:
       {
         "name": "surfdiary",
         "version": "1.0.0",
@@ -85,15 +85,23 @@ The app itself is built with node.js, React (in development) and React Native (i
           "node": "^12"
         }
       }
+      
+      //web:
+      in development
+      
+      //mobile:
+      in development
 
 
 ### How to run the project:
 
 * backend:
-  yarn dev
+  "scripts": {
+          "dev": "nodemon server.js",
+          "build": "NODE_ENV=production nodemon server.js",
+          "authServer": "nodemon authServer.js",
+          "buildauthServer": "NODE_ENV=production nodemon authServer.js",
+          "test": "echo \"Error: no test specified\" && exit 1"
+        },
 
-* web 
-  yarn start
-  
-* mobile:
-  npm start
+
