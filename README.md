@@ -8,14 +8,12 @@ This project is developed in mind to register all the the days we surf along our
 The app itself is built with node.js, React (in development) and React Native (in delelopment).
 
 
-### Built with:
+### Built With:
 
-* backend (nodeJS):
-   "axios": "^0.19.1",
-   "cors": "^2.8.5",
-   "express": "^4.17.1",
-   "mongoose": "^5.8.7",
-   "socket.io": "^2.3.0"
+* JavaScript
+* Node.js
+* React (in development)
+* React Native (in development)
 
 * web (React):
    "axios": "^0.19.1",
