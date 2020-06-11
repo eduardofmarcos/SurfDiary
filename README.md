@@ -5,7 +5,7 @@
 ### About this project:
 
 This project is developed in mind to register all the the days we surf along our lives. As a surfer myself I always wanted to register the day and conditions of surfing that day in a nice user friendly app.
-The app itself is built with node.js, React (in development) and React Native (in delelopment).
+The app itself is built with node.js, React (in development) and React Native (in development).
 
 
 ### Built With:
