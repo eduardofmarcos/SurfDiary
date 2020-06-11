@@ -95,13 +95,13 @@ The app itself is built with node.js, React (in development) and React Native (i
 
 ### How to run the project:
 
-* backend:
-  "scripts": {
-          "dev": "nodemon server.js",
-          "build": "NODE_ENV=production nodemon server.js",
-          "authServer": "nodemon authServer.js",
-          "buildauthServer": "NODE_ENV=production nodemon authServer.js",
-          "test": "echo \"Error: no test specified\" && exit 1"
-        },
+        * backend:
+        "scripts": {
+                "dev": "nodemon server.js",
+                "build": "NODE_ENV=production nodemon server.js",
+                "authServer": "nodemon authServer.js",
+                "buildauthServer": "NODE_ENV=production nodemon authServer.js",
+                "test": "echo \"Error: no test specified\" && exit 1"
+              },
 
 
